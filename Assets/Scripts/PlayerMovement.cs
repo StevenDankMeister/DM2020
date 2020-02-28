@@ -5,16 +5,19 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private int movement_speed;
-    [SerializeField] private int jump_height;
+    [SerializeField] private float jump_height;
     private float moveHorizontal;
+    private float jump_direction;
     private Rigidbody2D rb;
 
     [SerializeField] private bool grounded;
+    public bool jump_charging;
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         grounded = false;
+        jump_charging = false;
     }
 
     // Update is called once per frame
@@ -22,28 +25,39 @@ public class PlayerMovement : MonoBehaviour
     {
         MoveHorizontal();
         Jump();
-        
     }
 
     private void Jump(){
         if(!grounded) {
             return;
         }
+        // Charge jump
+        if(Input.GetButton("Jump") && jump_height < 5){
+            jump_charging = true;
+            
+            rb.velocity = new Vector3(0.0f, 0.0f, 0.0f);
+            jump_height += 0.1f;
+        }
 
-        if (Input.GetButton("Vertical")){
-            rb.velocity = new Vector3(rb.velocity.x, jump_height, 0.0f);
+        // Release jump
+        if(Input.GetButtonUp("Jump")){
+            jump_direction = Input.GetAxis("Horizontal");
+            rb.velocity = new Vector3(jump_direction, jump_height, 0.0f);
+            jump_charging = false;
         }
     }
     private void MoveHorizontal()
     {
-        if (Input.GetButton("Horizontal"))
-        {
+        if(!grounded || jump_charging){
+            return;
+        }
+
+        if (Input.GetButton("Horizontal")){
             moveHorizontal = Input.GetAxis("Horizontal") * movement_speed;
             rb.velocity = new Vector3(moveHorizontal, rb.velocity.y, 0.0f);
         }
 
-        if (Input.GetButtonUp("Horizontal"))
-        {
+        if (Input.GetButtonUp("Horizontal")){
             rb.velocity = new Vector3(0.0f, rb.velocity.y, 0.0f);
         }
     }
@@ -52,6 +66,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if(collision.gameObject.tag == "Wall"){
             grounded = true;
+            jump_height = 0;
         }
     }
 
