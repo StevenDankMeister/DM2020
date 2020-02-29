@@ -6,6 +6,7 @@ public class Hider : MonoBehaviour
 {
     private SpriteRenderer spriteRenderer;
     [SerializeField] private GameObject lamps;
+    [SerializeField] private GameObject BLACK;
     private Transform lamps_transform;
     private GameObject light;
 
@@ -25,6 +26,7 @@ public class Hider : MonoBehaviour
         if(collision.gameObject.tag == "Player"){
             HideShowLamps(lamps, false);
             spriteRenderer.enabled = true;
+            //BLACK.SetActive(true);
         }    
     }
 
@@ -32,6 +34,7 @@ public class Hider : MonoBehaviour
         if(collision.gameObject.tag == "Player"){
             HideShowLamps(lamps, true);
             spriteRenderer.enabled = false;
+            //BLACK.SetActive(false);
         }    
     }
 
