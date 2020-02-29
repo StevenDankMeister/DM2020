@@ -7,17 +7,19 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private int movement_speed;
     [SerializeField] private float jump_height;
     private float moveHorizontal;
-    private float jump_direction;
+    public float direction;
     private Rigidbody2D rb;
 
-    [SerializeField] private bool grounded;
+    private bool grounded;
     public bool jump_charging;
+    public bool moving;
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         grounded = false;
         jump_charging = false;
+        direction = 0;
     }
 
     // Update is called once per frame
@@ -31,9 +33,11 @@ public class PlayerMovement : MonoBehaviour
         if(!grounded) {
             return;
         }
+
         // Charge jump
         if(Input.GetButton("Jump") && jump_height < 5){
             jump_charging = true;
+            moving = false;
             
             rb.velocity = new Vector3(0.0f, 0.0f, 0.0f);
             jump_height += 0.1f;
@@ -41,23 +45,27 @@ public class PlayerMovement : MonoBehaviour
 
         // Release jump
         if(Input.GetButtonUp("Jump")){
-            jump_direction = Input.GetAxis("Horizontal");
-            rb.velocity = new Vector3(jump_direction, jump_height, 0.0f);
-            jump_charging = false;
+            direction =  Mathf.Sign(direction)*Mathf.Ceil(Mathf.Abs(direction));
+            print(direction);
+            rb.velocity = new Vector3(direction*3f, jump_height, 0.0f);
         }
     }
     private void MoveHorizontal()
     {
+        direction = Input.GetAxis("Horizontal");
+
         if(!grounded || jump_charging){
             return;
         }
 
         if (Input.GetButton("Horizontal")){
-            moveHorizontal = Input.GetAxis("Horizontal") * movement_speed;
+            moving = true;
+            moveHorizontal = direction * movement_speed;
             rb.velocity = new Vector3(moveHorizontal, rb.velocity.y, 0.0f);
         }
 
         if (Input.GetButtonUp("Horizontal")){
+            moving = false;
             rb.velocity = new Vector3(0.0f, rb.velocity.y, 0.0f);
         }
     }
@@ -67,6 +75,7 @@ public class PlayerMovement : MonoBehaviour
         if(collision.gameObject.tag == "Wall"){
             grounded = true;
             jump_height = 0;
+            jump_charging = false;
         }
     }
 
