@@ -30,7 +30,9 @@ public class SpriteChanger : MonoBehaviour
         if(playerMovement.jump_charging){
             animator.enabled = false;
             SetSprite(jump_charging_sprite);
-        } else{
+        }
+
+        if(!playerMovement.grounded){
             animator.enabled = true;
             SetSprite(idle_sprite);
         }

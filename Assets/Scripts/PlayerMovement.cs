@@ -10,7 +10,7 @@ public class PlayerMovement : MonoBehaviour
     public float direction;
     private Rigidbody2D rb;
 
-    private bool grounded;
+    public bool grounded;
     public bool jump_charging;
     public bool moving;
     // Start is called before the first frame update
@@ -46,8 +46,8 @@ public class PlayerMovement : MonoBehaviour
         // Release jump
         if(Input.GetButtonUp("Jump")){
             direction =  Mathf.Sign(direction)*Mathf.Ceil(Mathf.Abs(direction));
-            print(direction);
             rb.velocity = new Vector3(direction*3f, jump_height, 0.0f);
+            jump_charging = false;
         }
     }
     private void MoveHorizontal()
@@ -76,6 +76,7 @@ public class PlayerMovement : MonoBehaviour
             grounded = true;
             jump_height = 0;
             jump_charging = false;
+            rb.velocity = new Vector3(0.0f, rb.velocity.y, 0.0f);
         }
     }
 
@@ -83,6 +84,13 @@ public class PlayerMovement : MonoBehaviour
     {
         if(collision.gameObject.tag == "Wall"){
             grounded = false;
+        }
+    }
+
+    void OnCollisionStay2D(Collision2D collision)
+    {
+        if(collision.gameObject.tag == "Wall"){
+            grounded = true;
         }
     }
 }
